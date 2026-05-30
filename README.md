@@ -45,7 +45,6 @@ A Home Assistant add-on to connect your **Iotics smart home devices** with fully
 2. Enter your Iotics credentials:
    - **iotics_email**: Your Iotics account email (e.g., `you@example.com`)
    - **iotics_password**: Your Iotics account password
-   - **iotics_appid**: Leave as default (`696f74696373617070`)
 3. Click **Save**
 
 ### 4. Start

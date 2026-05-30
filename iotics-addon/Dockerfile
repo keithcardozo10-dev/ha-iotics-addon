@@ -1,7 +1,7 @@
 FROM python:3-alpine
 
-RUN apk add --no-cache arp-scan net-tools ca-certificates && \
-    pip3 install --no-cache-dir websocket-client
+RUN apk add --no-cache bash arp-scan net-tools ca-certificates && \
+    pip3 install --no-cache-dir websocket-client websockets
 
 COPY bridge.py /opt/iotics-bridge/bridge.py
 COPY run.sh /
