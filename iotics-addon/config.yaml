@@ -1,5 +1,5 @@
 name: Iotics Smart Home Bridge
-version: "1.0.0"
+version: "2.0.0"
 slug: iotics_smart_home_bridge
 description: Connect your Iotics smart home devices to Home Assistant. Just enter your email and password — auto-discovers all switches, lights, fans, and sensors.
 url: https://github.com/keithcardozo10-dev/ha-iotics-addon
@@ -20,8 +20,8 @@ apparmor: false
 privileged:
   - NET_ADMIN
 options:
-  iotics_email: ""
-  iotics_password: ""
+  iotics_email: "keithcardozo@hotmail.com"
+  iotics_password: "Rednation@1310"
   iotics_appid: "696f74696373617070"
 schema:
   iotics_email: str

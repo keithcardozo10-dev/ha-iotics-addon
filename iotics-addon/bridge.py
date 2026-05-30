@@ -632,55 +632,26 @@ def gen_dashboard():
 
 # ── Dashboard push ─────────────────────────────────────────────────────────
 def push_dashboard():
-    """Push the dashboard to HA via WebSocket."""
+    """Push the dashboard to HA as a separate dashboard (not overwriting default Lovelace)."""
     config = gen_dashboard()
     room_count = len([c for c in config.get("cards", []) if c.get("type") == "heading"])
 
-    import websockets.sync.client as ws_client
+    import urllib.request
     try:
-        ws = ws_client.connect(
-            f"{HASS_URL.replace('http://', 'ws://').replace('https://', 'wss://')}/api/websocket",
-            additional_headers={"Authorization": f"Bearer {HASS_TOKEN}"},
-            open_timeout=10,
-        )
-        msg = json.loads(ws.recv())
-        if msg.get("type") == "auth_required":
-            ws.send(json.dumps({"type": "auth", "access_token": HASS_TOKEN}))
-            auth = json.loads(ws.recv())
-            if auth.get("type") != "auth_ok":
-                ws.close()
-                return
-
-        # Get current config
-        ws.send(json.dumps({"id": 1, "type": "lovelace/config"}))
-        resp = json.loads(ws.recv())
-        if resp.get("success") and resp.get("result"):
-            cur = resp["result"]
-            views = cur.get("views", []) if isinstance(cur, dict) else (cur if isinstance(cur, list) else [])
+        # Push as a dedicated dashboard via REST API: /api/lovelace/config/iotics
+        url = f"{HASS_URL}/api/lovelace/config/iotics"
+        payload = json.dumps(config).encode()
+        req = urllib.request.Request(url, data=payload, method="PUT")
+        req.add_header("Authorization", f"Bearer {HASS_TOKEN}")
+        req.add_header("Content-Type", "application/json")
+        resp = urllib.request.urlopen(req, timeout=15)
+        if resp.status == 200:
+            log.info("[LOVELACE] Dashboard 'Iotics Smart Home' pushed: %d rooms", room_count)
         else:
-            views = []
-
-        # Merge/update the Iotics view
-        replaced = False
-        for i, v in enumerate(views):
-            if isinstance(v, dict) and v.get("path") == "iotics":
-                views[i] = config
-                replaced = True
-                break
-        if not replaced:
-            views.append(config)
-
-        # Save
-        ws.send(json.dumps({
-            "id": 2, "type": "lovelace/config/save",
-            "config": {"views": views},
-        }))
-        save = json.loads(ws.recv())
-        if save.get("success"):
-            log.info("[LOVELACE] Dashboard pushed: %d rooms", room_count)
-        else:
-            log.warning("[LOVELACE] Save failed: %s", save)
-        ws.close()
+            log.warning("[LOVELACE] Push returned %s: %s", resp.status, resp.read().decode())
+    except urllib.error.HTTPError as e:
+        body = e.read().decode() if e.fp else ""
+        log.warning("[LOVELACE] Push failed (%s): %s", e.code, body)
     except Exception as e:
         log.warning("[LOVELACE] Push failed: %s", e)
 
@@ -722,12 +693,9 @@ def main():
     try:
         while True:
             time.sleep(10)
-            # Periodic dashboard refresh (every 5 min) and heartbeat
-            room_cfg = gen_dashboard()
-            room_count = len([c for c in room_cfg.get("cards", []) if c.get("type") == "heading"])
             btn_count = sum(len(d.get("buttons", {})) for d in DEVICES.values())
             log.info("[HEARTBEAT] %d rooms, %d devices, %d buttons",
-                     room_count, len(DEVICES), btn_count)
+                     len(DEVICES.get("rooms", [])), len(DEVICES), btn_count)
     except KeyboardInterrupt:
         log.info("Shutting down...")
         sys.exit(0)
