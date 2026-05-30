@@ -19,6 +19,7 @@ A Home Assistant add-on to connect your **Iotics smart home devices** with fully
 - Home Assistant (HAOS, Docker, or supervised installation)
 - An active Iotics account with smart home devices registered
 - Your Iotics login credentials (email + password)
+- Your Iotics app API key (pre-filled in config — see *How to find your Iotics App ID* below if login fails)
 - Iotics devices must be on the same local network as your HA server (for HTTP command control)
 
 ## Installation
@@ -45,7 +46,17 @@ A Home Assistant add-on to connect your **Iotics smart home devices** with fully
 2. Enter your Iotics credentials:
    - **iotics_email**: Your Iotics account email (e.g., `you@example.com`)
    - **iotics_password**: Your Iotics account password
-3. Click **Save**
+3. The **iotics_appid** field is pre-filled with the standard Iotics mobile app key. In most cases you can leave it as-is.
+4. Click **Save**
+
+### How to find your Iotics App ID (if the default doesn't work)
+
+The `iotics_appid` is the API key embedded in the Iotics mobile app. The addon comes pre-filled with the standard key (`696f74696373617070`). If you get a login error, you need to extract the correct key from your own Iotics iOS app:
+
+1. If you have an iPhone/iPad, use **iMazing** or similar to browse the Iotics app's files
+2. Navigate to the app bundle and find the `main.jsbundle` file
+3. Search for the string `696f74696373617070` — that's the appid
+4. Paste it into the **iotics_appid** field in the addon config
 
 ### 4. Start
 
@@ -137,7 +148,7 @@ The add-on creates a dedicated **Iotics Smart Home** Lovelace view with:
 
 | Symptom | Likely Cause | Fix |
 |---------|-------------|-----|
-| "Login failed" in log | Wrong email/password | Check credentials in add-on config, restart |
+| "Login failed" in log | Wrong email/password or wrong appid | Check credentials, or follow "How to find your Iotics App ID" above |
 | No devices appear | Iotics account has no registered devices | Verify in the Iotics mobile app |
 | Toggle doesn't turn device on/off | Device IP not reachable | Ensure Iotics devices are on the same network |
 | Entities show old state | Cloud sync in progress | Wait up to 5 seconds for the next poll |
