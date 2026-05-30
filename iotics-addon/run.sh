@@ -42,5 +42,6 @@ cd /opt/iotics-bridge
 exec python3 -u /opt/iotics-bridge/bridge.py \
     --iotics-email "${IOTICS_EMAIL}" \
     --iotics-password "${IOTICS_PASSWORD}" \
+    --iotics-appid "${IOTICS_APPID}" \
     --log-level info \
     --log-file /tmp/iotics_bridge.log

@@ -92,6 +92,19 @@ for _i, _a in enumerate(sys.argv[1:]):
                 IOTICS_APPID = _val
         _skip_next = True
 
+# ── /data/options.json fallback (HA addon mode) ────────────────────────────
+OPTIONS_PATH = Path("/data/options.json")
+if OPTIONS_PATH.exists():
+    try:
+        opts = json.loads(OPTIONS_PATH.read_text())
+        IOTICS_EMAIL = opts.get("iotics_email", IOTICS_EMAIL) if not IOTICS_EMAIL else IOTICS_EMAIL
+        IOTICS_PASSWORD = opts.get("iotics_password", IOTICS_PASSWORD) if not IOTICS_PASSWORD else IOTICS_PASSWORD
+        IOTICS_APPID = opts.get("iotics_appid", IOTICS_APPID)
+    except Exception as e:
+        log.warning("Failed reading /data/options.json: %s", e)
+
+log.info("Config: email=%s appid=%s", IOTICS_EMAIL[:4] + "..." if IOTICS_EMAIL else "(empty)", IOTICS_APPID)
+
 # ── State ──────────────────────────────────────────────────────────────────
 DEVICES = {}         # token (lowercase mac) -> {room_key, buttons: {btn: {label, type, is_fan}}}
 ENTITY_CACHE = {}    # entity_id -> JSON state string (for change detection)

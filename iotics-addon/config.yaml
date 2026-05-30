@@ -22,6 +22,8 @@ privileged:
 options:
   iotics_email: ""
   iotics_password: ""
+  iotics_appid: "696f74696373617070"
 schema:
   iotics_email: str
   iotics_password: str
+  iotics_appid: str
