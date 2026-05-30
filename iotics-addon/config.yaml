@@ -1,0 +1,33 @@
+name: Iotics Smart Home Bridge
+version: "1.0.0"
+slug: iotics_smart_home_bridge
+description: Connect your Iotics smart home devices to Home Assistant. Auto-discovers all switches, lights, fans, and sensors with dynamic naming.
+url: https://github.com/keithcardozo10-dev/ha-iotics-addon
+arch:
+  - armhf
+  - armv7
+  - aarch64
+  - amd64
+  - i386
+init: false
+startup: application
+boot: auto
+hassio_api: true
+hassio_role: default
+homeassistant_api: true
+auth_api: true
+ports: {}
+ports_description: {}
+host_network: true
+apparmor: false
+privileged:
+  - NET_ADMIN
+options:
+  iotics_email: ""
+  iotics_password: ""
+  iotics_appid: "696f74696373617070"
+schema:
+  iotics_email: email
+  iotics_password: password
+  iotics_appid: str
+image: ghcr.io/keithcardozo10-dev/ha-iotics-addon
