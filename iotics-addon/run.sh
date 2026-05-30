@@ -7,18 +7,21 @@ set -e
 
 echo "[IOTICS] Starting Iotics Smart Home Bridge..."
 
+# Credentials come from addon config (set as env vars by HA supervisor)
 IOTICS_EMAIL="${IOTICS_EMAIL:-}"
 IOTICS_PASSWORD="${IOTICS_PASSWORD:-}"
 IOTICS_APPID="${IOTICS_APPID:-696f74696373617070}"
 
-# Read from /data/options.json if env vars are empty (HA addon mode)
-if [ -f /data/options.json ]; then
-    echo "[IOTICS] Reading config from /data/options.json..."
-    CONFIG=$(cat /data/options.json)
-    [ -z "$IOTICS_EMAIL" ] && IOTICS_EMAIL=$(echo "$CONFIG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('iotics_email',''))")
-    [ -z "$IOTICS_PASSWORD" ] && IOTICS_PASSWORD=$(echo "$CONFIG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('iotics_password',''))")
-    APPID=$(echo "$CONFIG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('iotics_appid',''))")
-    [ -n "$APPID" ] && IOTICS_APPID="$APPID"
+# Also try /data/options.json if env vars are empty (fallback)
+if [ -z "$IOTICS_EMAIL" ] || [ -z "$IOTICS_PASSWORD" ]; then
+    if [ -f /data/options.json ]; then
+        echo "[IOTICS] Reading config from /data/options.json..."
+        CONFIG=$(cat /data/options.json)
+        [ -z "$IOTICS_EMAIL" ] && IOTICS_EMAIL=$(echo "$CONFIG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('iotics_email',''))")
+        [ -z "$IOTICS_PASSWORD" ] && IOTICS_PASSWORD=$(echo "$CONFIG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('iotics_password',''))")
+        APPID=$(echo "$CONFIG" | python3 -c "import json,sys; print(json.load(sys.stdin).get('iotics_appid',''))")
+        [ -n "$APPID" ] && IOTICS_APPID="$APPID"
+    fi
 fi
 
 if [ -z "$IOTICS_EMAIL" ] || [ -z "$IOTICS_PASSWORD" ]; then
